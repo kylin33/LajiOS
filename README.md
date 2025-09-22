@@ -9,7 +9,7 @@ a Rust simple  operating system
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-可以手动下载https://sh.rustup.rs中rustup-init.sh文件，然后修改RUSTUP_UPDATE_ROOT 变量改为 https://mirrors.ustc.edu.cn/rust-static/rustup进行安装，中间会有提示菜单，选择默认即可。
+可以手动下载https://sh.rustup.rs中rustup-init.sh 文件，然后修改RUSTUP_UPDATE_ROOT 变量改为 https://mirrors.ustc.edu.cn/rust-static/rustup 进行安装，中间会有提示菜单，选择默认即可。
 
 ### 2. 安装 rust nightly
 
@@ -22,4 +22,11 @@ rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 
 ```bash
 sudo apt install qemu-system-x86 qemu-kvm
+```
+
+### 4. 编译与运行
+
+```bash
+cargo build
+cargo run
 ```
