@@ -5,9 +5,11 @@
 #![reexport_test_harness_main = "test_main"]
 
 mod vga_buffer;
+mod serial;
 
 use core::panic::PanicInfo;
 
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
@@ -15,10 +17,34 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 #[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]){
-    println!("Running {} test", tests.len());
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    serial_println!("[failed]\n");
+    serial_println!("Error: {}\n", info);
+    exit_qemu(QemuExitCode::Failed);
+    loop {}
+}
+
+pub trait Testable{
+    fn run(&self) -> ();
+}
+
+impl<T> Testable for T
+where
+    T: Fn(),
+{
+    fn run(&self){
+        serial_print!("{}...\t", core::any::type_name::<T>());
+        self();
+        serial_println!("[ok]");
+    }
+}
+
+#[cfg(test)]
+pub fn test_runner(tests: &[&dyn Testable]){
+    serial_println!("Running {} tests", tests.len());
     for test in tests{
-       test();
+       test.run();
     }
 
     exit_qemu(QemuExitCode::Success);
@@ -36,9 +62,19 @@ pub extern "C" fn _start() -> ! {
 
 #[test_case]
 fn trivial_assertion(){
-    print!("trivial assertion ...");
     assert_eq!(1, 1);
-    println!("[ok]");
+}
+
+#[test_case]
+fn test_println_simple(){
+    println!("test_println_simple output");
+}
+
+#[test_case]
+fn test_println_many() {
+    for _ in 0..200 {
+        println!("test_println_many output");
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
