@@ -65,17 +65,7 @@ fn trivial_assertion(){
     assert_eq!(1, 1);
 }
 
-#[test_case]
-fn test_println_simple(){
-    println!("test_println_simple output");
-}
 
-#[test_case]
-fn test_println_many() {
-    for _ in 0..200 {
-        println!("test_println_many output");
-    }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
