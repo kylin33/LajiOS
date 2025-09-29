@@ -1,4 +1,15 @@
 use volatile::Volatile;
+use lazy_static::lazy_static;
+use spin::Mutex;
+use core::fmt;
+
+lazy_static! {
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer{
+        column_position: 0,
+        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    });
+}
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -106,7 +117,6 @@ impl Writer{
     }
 }
 
-use core::fmt;
 
 impl fmt::Write for Writer{
     fn write_str(&mut self, s: &str) -> fmt::Result{
@@ -115,15 +125,6 @@ impl fmt::Write for Writer{
     }
 }
 
-use lazy_static::lazy_static;
-use spin::Mutex;
-lazy_static! {
-    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer{
-        column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    });
-}
 
 #[macro_export]
 macro_rules! print{
@@ -163,16 +164,3 @@ fn test_println_output() {
         assert_eq!(char::from(screen_char.ascii_character), c);
     }
 }
-
-// pub fn print_something() {
-//     use core::fmt::Write;
-//     let mut writer = Writer {
-//         column_position: 0,
-//         color_code: ColorCode::new(Color::Yellow, Color::Black),
-//         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-//     };
-
-//     writer.write_byte(b'H');
-//     writer.write_string("ello! ");
-//     write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
-// }
