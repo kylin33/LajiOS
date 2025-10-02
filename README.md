@@ -21,10 +21,19 @@ rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 ### 3. 安装 qemu
 
 ```bash
-sudo apt install qemu-system-x86 qemu-kvm
+sudo apt install qemu-system-x86 qemu-kvm gcc
 ```
 
-### 4. 编译与运行
+
+### 4. 安装bootimage
+
+需要引导程序将负责初始化 CPU 并加载我们的内核。
+```bash
+cargo install bootimage
+rustup component add llvm-tools-preview
+```
+
+### 5. 编译与运行
 
 ```bash
 cargo build
