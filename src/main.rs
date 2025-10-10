@@ -31,11 +31,11 @@ pub extern "C" fn _start() -> ! {
     // unsafe{
     //     *(0xdeadbeef as *mut u8) = 42;
     // };     // 使用unsafe操作 无效内存地址，必然抛出 page fault
-    fn stack_overflow(){
-        stack_overflow();
-    }
+    // fn stack_overflow(){
+    //     stack_overflow();
+    // }
 
-    stack_overflow();
+    // stack_overflow();
 
 
     #[cfg(test)]
