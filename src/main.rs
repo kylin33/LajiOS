@@ -27,22 +27,14 @@ pub extern "C" fn _start() -> ! {
 
     LajiOS::init();
 
-    // x86_64::instructions::interrupts::int3(); //触发中断
-    // unsafe{
-    //     *(0xdeadbeef as *mut u8) = 42;
-    // };     // 使用unsafe操作 无效内存地址，必然抛出 page fault
-    // fn stack_overflow(){
-    //     stack_overflow();
-    // }
-
-    // stack_overflow();
-
-
     #[cfg(test)]
     test_main();
 
     println!("It did not crash!");
-    loop {}
+    loop {
+        use LajiOS::print;
+        print!("-");
+    }
 }
 
 #[test_case]
