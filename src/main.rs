@@ -11,7 +11,7 @@ use LajiOS::println;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    LajiOS::hlt_loop();
 }
 
 #[cfg(test)]
@@ -31,10 +31,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("It did not crash!");
-    loop {
-        use LajiOS::print;
-        print!("-");
-    }
+    LajiOS::hlt_loop();
 }
 
 #[test_case]
