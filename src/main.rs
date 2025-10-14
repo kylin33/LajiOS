@@ -26,19 +26,24 @@ fn panic(info: &PanicInfo) -> ! {
 
 
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    use LajiOS::memory::active_level_4_table;
-    use x86_64::VirtAddr;
+    use LajiOS::memory;
+    use x86_64::{structures::paging::Translate, VirtAddr};
 
     println!("Hello World{}", "!");
     LajiOS::init();
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let l4_table = unsafe { active_level_4_table(phys_mem_offset) };
-
-    for (i, entry) in l4_table.iter().enumerate() {
-        if !entry.is_unused() {
-            println!("L4 Entry {}: {:?}", i, entry);
-        }
+    let mapper = unsafe{memory::init(phys_mem_offset)};
+    let addresses = [
+        0xb8000,
+        0x201008,
+        0x0100_0020_1a10,
+        boot_info.physical_memory_offset,
+    ];
+    for &address in &addresses {
+        let virt = VirtAddr::new(address);
+        let phys = mapper.translate_addr(virt);
+        println!("{:?} -> {:?}", virt, phys);
     }
 
     #[cfg(test)]
