@@ -6,7 +6,6 @@
 #![feature(abi_x86_interrupt)]
 
 extern crate alloc;
-
 use core::panic::PanicInfo;
 
 pub mod vga_buffer;

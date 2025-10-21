@@ -6,10 +6,14 @@ use x86_64::{
     },
     VirtAddr,
 };
-use linked_list_allocator::LockedHeap;
 
 pub struct Dummy;
 pub mod bump;
+
+use bump::BumpAllocator;
+
+#[global_allocator]
+static ALLOCATOR: Locked<BumpAllocator> = Locked::new(BumpAllocator::new());
 
 pub const HEAP_START: usize = 0x_4444_4444_0000;
 pub const HEAP_SIZE: usize = 100 * 1024;
@@ -24,8 +28,21 @@ unsafe impl GlobalAlloc for Dummy {
     }
 }
 
-#[global_allocator]
-static ALLOCATOR: LockedHeap = LockedHeap::empty();
+pub struct Locked<A> {
+    inner: spin::Mutex<A>,
+}
+
+impl<A> Locked<A> {
+    pub const fn new(inner: A) -> Self {
+        Locked {
+            inner: spin::Mutex::new(inner),
+        }
+    }
+
+    pub fn lock(&self) -> spin::MutexGuard<A> {
+        self.inner.lock()
+    }
+}
 
 pub fn init_heap(
     mapper: &mut impl Mapper<Size4KiB>,
@@ -54,4 +71,8 @@ pub fn init_heap(
     }
 
     Ok(())
+}
+
+fn align_up(addr: usize, align: usize) -> usize {
+    (addr + align - 1) & !(align - 1)
 }

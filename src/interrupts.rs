@@ -1,5 +1,4 @@
 use core::u8;
-
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 use crate::{gdt, print, println, hlt_loop};
 use lazy_static::lazy_static;
@@ -15,7 +14,6 @@ pub enum InterruptIndex{
     Timer = PIC_1_OFFSET,
     Keyboard,
 }
-
 
 impl InterruptIndex{
     fn as_u8(self) -> u8{
@@ -122,24 +120,4 @@ extern "x86-interrupt" fn page_fault_handler(
 #[test_case]
 fn test_breakpoint_exception(){
     x86_64::instructions::interrupts::int3();
-}
-
-pub struct Locked<A> {
-    inner: spin::Mutex<A>,
-}
-
-impl<A> Locked<A> {
-    pub const fn new(inner: A) -> Self {
-        Locked {
-            inner: spin::Mutex::new(inner),
-        }
-    }
-
-    pub fn lock(&self) -> spin::MutexGuard<A> {
-        self.inner.lock()
-    }
-}
-
-fn align_up(addr: usize, align: usize) -> usize {
-    (addr + align - 1) & !(align - 1)
 }
